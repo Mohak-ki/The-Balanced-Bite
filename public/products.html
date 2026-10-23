@@ -1,0 +1,419 @@
+<!-- products -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Balanced Bite - Products</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+  <!-- Your stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+</head>
+<body>
+
+  <!-- 🛒 Cart Sidebar -->
+  <aside id="cartSidebar">
+    <header>
+      <span>Your Cart</span>
+      <button id="closeCart" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">✖</button>
+    </header>
+    <div id="cartItems"></div>
+    <div id="cartTotal">
+      <span>Total:</span> <span id="cartTotalPrice">₹0</span>
+    </div>
+    <button id="checkoutBtn">Proceed to Checkout</button>
+  </aside>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-leaf"></i></div>
+        <div>
+          <div class="brand-title">The Balanced Bite</div>
+          <div class="brand-sub">~ Healthy & Hearty</div>
+        </div>
+      </div>
+
+      <nav>
+       <a class="link" href="index.html">Home</a>
+        <a class="link" href="products.html">Products</a>
+        <a class="link" href="subscriptions.html">Combo Plans</a>
+        <a class="link" href="workshops.html">Workshops</a>
+        <a class="link" href="blog.html">Blog</a>
+        <a class="link" href="bulkorders.html">Bulk Orders</a>
+
+        <!-- 🛒 Cart Icon -->
+        <button id="cartIcon" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--choco)">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 💖 Products Section -->
+  <section id="products" class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>Our Featured Products</h2>
+          <p class="section-sub">Handcrafted with love, designed for your health 🌿</p>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="tabs" id="productTabs">
+        <button class="tab active" data-filter="all">All Products</button>
+        <button class="tab" data-filter="Cookies">Cookies</button>
+        <button class="tab" data-filter="Brownies">Brownies</button>
+        <button class="tab" data-filter="Cakes">Cakes</button>
+        <button class="tab" data-filter="Combo">Combo Packs</button>
+      </div>
+
+
+    <!-- Product Grid -->
+    <div class="grid" id="productGrid">
+
+      <!-- Product 1 -->
+      <article class="card" data-cat="Cookies">
+        <div class="thumb">
+          <span class="badge">17% OFF</span>
+          <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Gut-Friendly Oat Cookies"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Gut-Friendly</span><span class="tag">Gluten Free</span></div>
+          <div class="title">Gut-Friendly Oat Cookies</div>
+          <div class="desc">Made with prebiotic-rich oats and gut-supporting ingredients</div>
+          <div class="meta-line"><span class="rating">4.8 (124 reviews)</span><span>210g</span></div>
+          <div class="price"><span class="now">₹350</span><span class="was">₹420</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 2 -->
+      <article class="card" data-cat="Brownies">
+        <div class="thumb">
+          <span class="badge">10% OFF</span>
+          <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Vegan Brownies"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">PCOS Friendly</span><span class="tag">Vegan</span></div>
+          <div class="title">Vegan Brownies</div>
+          <div class="desc">Hormone-balancing brownies with cinnamon and healthy fats</div>
+          <div class="meta-line"><span class="rating">4.9 (89 reviews)</span><span>250g</span></div>
+          <div class="price"><span class="now">₹450</span><span class="was">₹500</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 3 -->
+      <article class="card" data-cat="Cakes">
+        <div class="thumb">
+          <span class="badge">13% OFF</span>
+          <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Clean Ingredient Almond Cake"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Gluten Free</span><span class="tag">Dairy Free</span></div>
+          <div class="title">Clean Ingredient Almond Cake</div>
+          <div class="desc">Celebration cake with only clean, wholesome ingredients</div>
+          <div class="meta-line"><span class="rating">4.7 (56 reviews)</span><span>500g</span></div>
+          <div class="price"><span class="now">₹650</span><span class="was">₹750</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 4 -->
+      <article class="card" data-cat="Cookies">
+        <div class="thumb">
+          <span class="badge">12% OFF</span>
+          <img src="https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Probiotic Banana Muffins"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Gut-Friendly</span><span class="tag">PCOS Friendly</span></div>
+          <div class="title">Probiotic Banana Muffins</div>
+          <div class="desc">Gut-health supporting muffins with natural probiotics</div>
+          <div class="meta-line"><span class="rating">4.6 (78 reviews)</span><span>300g</span></div>
+          <div class="price"><span class="now">₹380</span><span class="was">₹430</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 5 -->
+      <article class="card" data-cat="Combo">
+        <div class="thumb">
+          <span class="badge">13% OFF</span>
+          <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="DIY Cookie Mix Kit"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">DIY Kit</span><span class="tag">Gut-Friendly</span></div>
+          <div class="title">DIY Cookie Mix Kit</div>
+          <div class="desc">Everything you need to bake gut-friendly cookies at home</div>
+          <div class="meta-line"><span class="rating">4.5 (92 reviews)</span><span>400g kit</span></div>
+          <div class="price"><span class="now">₹420</span><span class="was">₹480</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 6 -->
+      <article class="card" data-cat="Combo">
+        <div class="thumb">
+          <span class="badge">15% OFF</span>
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmBaPN_rc9tSWEH2eM2EBdjKB7nhvfc204xA&s" alt="Healthy Snack Pack"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Variety Pack</span><span class="tag">Gut-Friendly</span></div>
+          <div class="title">Healthy Snack Pack</div>
+          <div class="desc">Mix of cookies, brownies, and mini cakes for a quick snack</div>
+          <div class="meta-line"><span class="rating">4.9 (120 reviews)</span><span>Mixed items</span></div>
+          <div class="price"><span class="now">₹650</span><span class="was">₹780</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 7 -->
+      <article class="card" data-cat="Cookies">
+        <div class="thumb">
+          <span class="badge">10% OFF</span>
+          <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Almond Butter Cookies"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">High Protein</span><span class="tag">Gluten Free</span></div>
+          <div class="title">Almond Butter Cookies</div>
+          <div class="desc">Crunchy, low-carb cookies made with almond butter</div>
+          <div class="meta-line"><span class="rating">4.7 (78 reviews)</span><span>200g</span></div>
+          <div class="price"><span class="now">₹360</span><span class="was">₹400</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 8 -->
+      <article class="card" data-cat="Brownies">
+        <div class="thumb">
+          <span class="badge">12% OFF</span>
+          <img src="https://images.unsplash.com/photo-1624353365286-3f8d62daad51?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Dark Chocolate Brownies"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Vegan</span><span class="tag">PCOS Friendly</span></div>
+          <div class="title">Dark Chocolate Brownies</div>
+          <div class="desc">Rich chocolate brownies with no refined sugar</div>
+          <div class="meta-line"><span class="rating">4.8 (102 reviews)</span><span>250g</span></div>
+          <div class="price"><span class="now">₹450</span><span class="was">₹510</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 9 -->
+      <article class="card" data-cat="Cakes">
+        <div class="thumb">
+          <span class="badge">15% OFF</span>
+          <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Vegan Carrot Cake"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Vegan</span><span class="tag">Gluten Free</span></div>
+          <div class="title">Vegan Carrot Cake</div>
+          <div class="desc">Soft carrot cake made with natural sweeteners</div>
+          <div class="meta-line"><span class="rating">4.9 (95 reviews)</span><span>500g</span></div>
+          <div class="price"><span class="now">₹680</span><span class="was">₹800</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 10 -->
+      <article class="card" data-cat="Cookies">
+        <div class="thumb">
+          <span class="badge">11% OFF</span>
+          <img src="data:image/jpeg;base64,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" alt="Choco Chip Cookies"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Classic</span><span class="tag">High Protein</span></div>
+          <div class="title">Classic Choco Chip Cookies</div>
+          <div class="desc">Rich chocolate chip cookies baked with wholesome ingredients</div>
+          <div class="meta-line"><span class="rating">4.5 (110 reviews)</span><span>220g</span></div>
+          <div class="price"><span class="now">₹330</span><span class="was">₹370</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 11 -->
+      <article class="card" data-cat="Brownies">
+        <div class="thumb">
+          <span class="badge">14% OFF</span>
+          <img src="https://richanddelish.com/wp-content/uploads/2023/07/Peanut-butter-brownies-1.jpg" alt="Peanut Butter Brownie"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">High Protein</span><span class="tag">Gluten Free</span></div>
+          <div class="title">Peanut Butter Brownie</div>
+          <div class="desc">Decadent brownie fused with peanut butter and healthy nuts</div>
+          <div class="meta-line"><span class="rating">4.7 (75 reviews)</span><span>260g</span></div>
+          <div class="price"><span class="now">₹470</span><span class="was">₹550</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 12 -->
+      <article class="card" data-cat="Cakes">
+        <div class="thumb">
+          <span class="badge">9% OFF</span>
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSu4eoVO25mpBgxYh8S5mGlARy5l8W6Pe84cg&s" alt="Banana Bread Cake"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Gluten Free</span><span class="tag">PCOS Friendly</span></div>
+          <div class="title">Banana Bread Cake</div>
+          <div class="desc">Moist banana bread cake with no refined sugar</div>
+          <div class="meta-line"><span class="rating">4.6 (64 reviews)</span><span>450g</span></div>
+          <div class="price"><span class="now">₹600</span><span class="was">₹660</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 13 -->
+      <article class="card" data-cat="Cookies">
+        <div class="thumb">
+          <span class="badge">15% OFF</span>
+          <img src="https://images.unsplash.com/photo-1623334044303-241021148842?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Oatmeal Raisin Cookies"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Heart Healthy</span><span class="tag">Gluten Free</span></div>
+          <div class="title">Oatmeal Raisin Cookies</div>
+          <div class="desc">Wholesome oats and raisins for a classic healthy treat</div>
+          <div class="meta-line"><span class="rating">4.4 (88 reviews)</span><span>230g</span></div>
+          <div class="price"><span class="now">₹310</span><span class="was">₹365</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 14 -->
+      <article class="card" data-cat="Brownies">
+        <div class="thumb">
+          <span class="badge">8% OFF</span>
+          <img src="https://images.unsplash.com/photo-1624353365286-3f8d62daad51?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Walnut Brownie"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Nuts</span><span class="tag">Dairy Free</span></div>
+          <div class="title">Walnut Brownie</div>
+          <div class="desc">Crunchy walnut pieces in your indulgent brownie</div>
+          <div class="meta-line"><span class="rating">4.3 (50 reviews)</span><span>250g</span></div>
+          <div class="price"><span class="now">₹430</span><span class="was">₹470</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 15 -->
+      <article class="card" data-cat="Cakes">
+        <div class="thumb">
+          <span class="badge">20% OFF</span>
+          <img src="https://images.unsplash.com/photo-1524351199678-941a58a3df50?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Blueberry Cheesecake"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Dairy Free</span><span class="tag">Gluten Free</span></div>
+          <div class="title">Blueberry Cheesecake</div>
+          <div class="desc">Creamy cheesecake topped with fresh blueberries</div>
+          <div class="meta-line"><span class="rating">4.9 (60 reviews)</span><span>550g</span></div>
+          <div class="price"><span class="now">₹750</span><span class="was">₹940</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 16 -->
+      <article class="card" data-cat="Combo">
+        <div class="thumb">
+          <span class="badge">18% OFF</span>
+          <img src="https://thebigmansworld.com/wp-content/uploads/2024/08/protein-cookie-dough-recipe.jpg" alt="Protein Snack Mix"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">High Protein</span><span class="tag">Gut-Friendly</span></div>
+          <div class="title">Protein Snack Mix</div>
+          <div class="desc">Mixture of protein-rich cookies and mini brownies</div>
+          <div class="meta-line"><span class="rating">4.8 (85 reviews)</span><span>350g</span></div>
+          <div class="price"><span class="now">₹500</span><span class="was">₹610</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 17 -->
+      <article class="card" data-cat="Cookies">
+        <div class="thumb">
+          <span class="badge">12% OFF</span>
+          <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Hazelnut Cookies"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Nutty</span><span class="tag">Low Sugar</span></div>
+          <div class="title">Hazelnut Cookies</div>
+          <div class="desc">Crispy cookies with roasted hazelnuts and low sugar</div>
+          <div class="meta-line"><span class="rating">4.5 (70 reviews)</span><span>200g</span></div>
+          <div class="price"><span class="now">₹340</span><span class="was">₹385</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 18 -->
+      <article class="card" data-cat="Cookies">
+        <div class="thumb">
+          <span class="badge">10% OFF</span>
+          <img src="https://prashantcorner.com/cdn/shop/files/MultigrainCookies.jpg?v=1730985048" alt="Multigrain Cookies"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Fiber Rich</span><span class="tag">Diabetic Friendly</span></div>
+          <div class="title">Multigrain Cookies</div>
+          <div class="desc">Wholesome cookies made from ragi, oats, and flax seeds for sustained energy.</div>
+          <div class="meta-line"><span class="rating">4.5 (102 reviews)</span><span>250g</span></div>
+          <div class="price"><span class="now">₹310</span><span class="was">₹345</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 19 -->
+      <article class="card" data-cat="Brownies">
+        <div class="thumb">
+          <span class="badge">16% OFF</span>
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSETZasg9gKVJLMyo9OlGjFAI-Tx_7Xy-ZX-Q&s" alt="Salted Caramel Brownie"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Indulgent</span><span class="tag">Gluten Free</span></div>
+          <div class="title">Salted Caramel Brownie</div>
+          <div class="desc">A gooey brownie filled with handmade salted caramel and dark chocolate.</div>
+          <div class="meta-line"><span class="rating">4.9 (190 reviews)</span><span>260g</span></div>
+          <div class="price"><span class="now">₹540</span><span class="was">₹640</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+      <!-- Product 20 -->
+      <article class="card" data-cat="Cakes">
+        <div class="thumb">
+          <span class="badge">12% OFF</span>
+          <img src="https://www.southernliving.com/thmb/mTaXLbKJRVgvsX_0Np1e2STyiLw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/StrawberryVanillaCake_132-c2776ede941c419a8e47d1048ea88a3c.jpg" alt="Strawberry Vanilla Cake"/>
+        </div>
+        <div class="body">
+          <div class="tags"><span class="tag">Classic</span><span class="tag">Low Sugar</span></div>
+          <div class="title">Strawberry Vanilla Cake</div>
+          <div class="desc">Fluffy vanilla sponge layered with real strawberry puree and cream.</div>
+          <div class="meta-line"><span class="rating">4.8 (210 reviews)</span><span>600g</span></div>
+          <div class="price"><span class="now">₹680</span><span class="was">₹770</span></div>
+          <div class="actions"><button class="btn cart">Add to Cart</button></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+  <!-- Footer -->
+  <footer style="background: linear-gradient(45deg, #8B4513, #D2691E); color: white; text-align: center; padding: 20px;">
+    <p>&copy; 2025 <strong>The Balanced Bite</strong> 🍪 | All Rights Reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

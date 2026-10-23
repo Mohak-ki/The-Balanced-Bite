@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In / Sign Up - The Balanced Bite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+  <style>
+    :root {
+      --choco:#4e342e;
+      --rose:#f6c7d7;
+      --cream:#fff7f4;
+      --caramel:#D2691E;
+    }
+    body {
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(135deg,var(--rose),var(--cream));
+      margin:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      min-height:100vh;
+    }
+
+    /* 🍪 Navbar */
+    header {
+      width:100%;
+      background:linear-gradient(90deg,#8B4513,#D2691E);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 20px;
+      box-shadow:0 3px 10px rgba(0,0,0,0.2);
+      color:#fff;
+      font-weight:600;
+    }
+    header .logo {
+      font-family:'Playfair Display',serif;
+      font-size:1.2rem;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    header .logo i { color:#fff; }
+    header nav a, header nav button {
+      color:#fff;
+      text-decoration:none;
+      background:none;
+      border:none;
+      font-size:1rem;
+      margin-left:15px;
+      cursor:pointer;
+      font-weight:600;
+      transition:0.2s;
+    }
+    header nav a:hover, header nav button:hover { opacity:0.85; }
+
+    /* Auth Card */
+    .auth-container {
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 10px 35px rgba(0,0,0,0.15);
+      overflow:hidden;
+      width:min(420px, 90%);
+      animation:fadeIn 0.5s ease;
+      margin-top:50px;
+    }
+    .tabs {
+      display:flex;
+      background:linear-gradient(90deg,#8B4513,#D2691E);
+      justify-content:space-evenly;
+      color:#fff;
+      font-weight:600;
+    }
+    .tab { padding:16px; flex:1; text-align:center; cursor:pointer; transition:background 0.3s ease; }
+    .tab.active { background:rgba(255,255,255,0.15); backdrop-filter:blur(5px); }
+    .form-wrapper { padding:30px; display:none; }
+    .form-wrapper.active { display:block; animation:slideUp 0.4s ease; }
+    h2 { font-family:'Playfair Display',serif; color:var(--choco); margin-bottom:6px; text-align:center; }
+    label { font-weight:600; color:var(--choco); display:block; margin-bottom:6px; }
+    input {
+      width:100%; padding:12px; border:1px solid #eadedb; border-radius:10px;
+      margin-bottom:16px; font-family:'Poppins',sans-serif; font-size:1rem;
+    }
+    .btn {
+      background:linear-gradient(90deg,#8B4513,#D2691E); color:#fff; border:none;
+      padding:12px; border-radius:10px; width:100%; font-weight:600;
+      cursor:pointer; transition:0.3s ease;
+    }
+    .btn:hover { background:linear-gradient(90deg,#D2691E,#8B4513); }
+    .back-link { display:inline-block; margin-top:14px; color:var(--choco); text-decoration:none; text-align:center; font-weight:500; width:100%; }
+    .back-link:hover { text-decoration:underline; }
+
+    .overlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.5); backdrop-filter:blur(3px); z-index:998;
+    }
+    .popup {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: linear-gradient(135deg, #8B4513, #D2691E);
+      color: #fff; border-radius: 18px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+      padding: 40px 30px 50px; text-align: center;
+      font-family: 'Poppins', sans-serif; z-index: 999;
+      width: min(420px, 90%); display: none;
+      animation: popupIn 0.5s ease forwards;
+    }
+    .popup i { font-size: 3rem; margin-bottom: 14px; color: #fff; }
+    .popup h3 { font-size: 1.5rem; margin-bottom: 10px; color:#fff; }
+    .popup p { font-size: 1rem; opacity: 0.95; line-height: 1.6; margin-bottom: 20px; color:#fff; }
+    .popup button {
+      background: #fff; color: #8B4513; border: none;
+      padding: 10px 24px; border-radius: 8px; font-weight: 600;
+      cursor: pointer; transition: 0.2s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    }
+    .popup button:hover { background: #ffe4c4; }
+
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    @keyframes slideUp { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+    @keyframes popupIn {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      60% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🍪 Navbar -->
+  <header>
+    <div class="logo"><i class="fa-solid fa-leaf"></i> The Balanced Bite</div>
+    <nav>
+      <a href="index.html" id="homeLink">Home</a>
+      <button id="logoutBtn" style="display:none;">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </nav>
+  </header>
+
+  <div class="auth-container">
+    <div class="tabs">
+      <div class="tab active" id="signInTab">Sign In</div>
+      <div class="tab" id="signUpTab">Sign Up</div>
+      <div class="tab" id="adminTab">Admin</div>
+    </div>
+
+    <div class="form-wrapper active" id="signInForm">
+      <h2>Welcome Back 🍪</h2>
+      <form id="signinForm">
+        <label>Email</label>
+        <input type="email" id="signinEmail" placeholder="Enter your Gmail" required>
+        <label>Password</label>
+        <input type="password" id="signinPass" placeholder="Enter your password" required>
+        <button type="submit" class="btn">Sign In</button>
+      </form>
+      <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+
+    <div class="form-wrapper" id="signUpForm">
+      <h2>Join The Balanced Bite 🎀</h2>
+      <form id="signupForm">
+        <label>Full Name</label>
+        <input type="text" id="signupName" placeholder="Enter your name" required>
+        <label>Email</label>
+        <input type="email" id="signupEmail" placeholder="Enter your Gmail" required>
+        <label>Password</label>
+        <input type="password" id="signupPass" placeholder="Create a password" required>
+        <button type="submit" class="btn">Sign Up</button>
+      </form>
+      <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+
+    <div class="form-wrapper" id="adminLoginForm">
+      <h2>Admin Access 🔐</h2>
+      <form id="adminForm">
+        <label>Admin Email</label>
+        <input type="email" id="adminEmail" placeholder="Enter admin email" required>
+        <label>Password</label>
+        <input type="password" id="adminPassword" placeholder="Enter password" required>
+        <button type="submit" class="btn">Admin Login</button>
+      </form>
+      <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+  </div>
+
+  <!-- Popup -->
+  <div class="overlay" id="overlay"></div>
+  <div class="popup" id="successPopup">
+    <i class="fa-solid fa-cookie-bite"></i>
+    <h3 id="popupTitle">Success!</h3>
+    <p id="popupText">Welcome to The Balanced Bite!</p>
+    <button id="closePopup">Go to Home 🍪</button>
+  </div>
+
+  <script>
+    // 🌸 Tabs
+    const signInTab = document.getElementById('signInTab');
+    const signUpTab = document.getElementById('signUpTab');
+    const adminTab = document.getElementById('adminTab');
+    const signInForm = document.getElementById('signInForm');
+    const signUpForm = document.getElementById('signUpForm');
+    const adminForm = document.getElementById('adminLoginForm');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const homeLink = document.getElementById('homeLink');
+
+    function switchTab(tab) {
+      [signInTab, signUpTab, adminTab].forEach(t => t.classList.remove('active'));
+      [signInForm, signUpForm, adminForm].forEach(f => f.classList.remove('active'));
+      tab.classList.add('active');
+      if (tab === signInTab) signInForm.classList.add('active');
+      if (tab === signUpTab) signUpForm.classList.add('active');
+      if (tab === adminTab) adminForm.classList.add('active');
+    }
+
+    signInTab.onclick = () => switchTab(signInTab);
+    signUpTab.onclick = () => switchTab(signUpTab);
+    adminTab.onclick = () => switchTab(adminTab);
+
+    // 🎉 Popup Logic
+    const popup = document.getElementById('successPopup');
+    const overlay = document.getElementById('overlay');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupText = document.getElementById('popupText');
+    const closePopup = document.getElementById('closePopup');
+
+    function showPopup(title, text) {
+      popupTitle.textContent = title;
+      popupText.textContent = text;
+      popup.style.display = 'block';
+      overlay.style.display = 'block';
+    }
+
+    closePopup.onclick = () => {
+      popup.style.display = 'none';
+      overlay.style.display = 'none';
+      window.location.href = 'index.html';
+    };
+
+    // 🧁 Sign In
+    document.getElementById('signinForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = document.getElementById('signinEmail').value.trim();
+      const password = document.getElementById('signinPass').value.trim();
+      const btn = e.target.querySelector('.btn');
+      btn.textContent = 'Signing in...'; btn.disabled = true;
+      try {
+        const res = await fetch('http://127.0.0.1:5000/api/users/signin', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('userToken', data.token);
+          localStorage.setItem('userName', data.user?.name || "User");
+          localStorage.setItem('justLoggedIn', 'true');
+          showPopup('Welcome Back!', `Welcome ${data.user?.name || "User"} 🍪`);
+          logoutBtn.style.display = 'inline-block';
+          homeLink.style.display = 'none';
+        } else showPopup('Login Failed', data.message);
+      } catch {
+        showPopup('Server Error', 'Unable to connect to backend.');
+      } finally { btn.textContent = 'Sign In'; btn.disabled = false; }
+    });
+
+    // 🧸 Sign Up
+    document.getElementById('signupForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPass').value.trim();
+      const btn = e.target.querySelector('.btn');
+      btn.textContent = 'Creating...'; btn.disabled = true;
+      try {
+        const res = await fetch('http://127.0.0.1:5000/api/users/signup', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('userToken', data.token);
+          localStorage.setItem('userName', name);
+          showPopup('Account Created 🎀', `Welcome ${name}!`);
+          logoutBtn.style.display = 'inline-block';
+          homeLink.style.display = 'none';
+        } else showPopup('Signup Failed', data.message);
+      } catch {
+        showPopup('Server Error', 'Unable to connect to backend.');
+      } finally { btn.textContent = 'Sign Up'; btn.disabled = false; }
+    });
+
+    // 🧩 Admin Login
+    document.getElementById('adminForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+      const btn = e.target.querySelector('.btn');
+      btn.textContent = 'Authenticating...'; btn.disabled = true;
+      try {
+        const res = await fetch('http://127.0.0.1:5000/api/admin/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('adminToken', data.token);
+          showPopup('Admin Access Granted!', 'Redirecting to dashboard...');
+          setTimeout(() => window.location.href = 'admin-dashboard.html', 1500);
+        } else showPopup('Access Denied', data.message);
+      } catch {
+        showPopup('Connection Error', 'Login failed. Please check connection.');
+      } finally { btn.textContent = 'Admin Login'; btn.disabled = false; }
+    });
+
+    // 🚪 Logout Button Clears All Data
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('cart');
+      localStorage.removeItem('justLoggedIn');
+      alert('You have been logged out 🍪');
+      window.location.reload();
+    });
+
+    // ✅ Show logout if already logged in
+    if (localStorage.getItem('userToken')) {
+      logoutBtn.style.display = 'inline-block';
+      homeLink.style.display = 'none';
+    }
+  </script>
+</body>
+</html>

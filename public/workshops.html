@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Balanced Bite — Workshops</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .workshops {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .work {
+      background: #fffaf4;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .work:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .work .top {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .work .muted {
+      color: #8b7c74;
+      font-size: 0.9rem;
+    }
+
+    .btn.primary {
+      background: var(--choco, #8B4513);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn.primary:hover {
+      background: #a0522d;
+    }
+
+    /* ✨ Floating Images */
+    .img-wrap {
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .float-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+      transform-origin: center;
+    }
+
+    .float-img.cookies {
+      animation: floatCookies 7s ease-in-out infinite;
+    }
+
+    .float-img.cakes {
+      animation: floatCakes 10s ease-in-out infinite;
+    }
+
+    @keyframes floatCookies {
+      0%, 100% { transform: scale(1) translateY(0); }
+      25% { transform: scale(1.04) translateY(-8px) rotate(-0.5deg); }
+      50% { transform: scale(1.07) translateY(4px) rotate(0.5deg); }
+      75% { transform: scale(1.05) translateY(-6px) rotate(-0.3deg); }
+    }
+
+    @keyframes floatCakes {
+      0%, 100% { transform: scale(1.02) translateY(0); }
+      30% { transform: scale(1.08) translateY(-6px) rotate(1deg); }
+      60% { transform: scale(1.05) translateY(6px) rotate(-1deg); }
+    }
+
+    /* ✨ Popup form styling */
+    #popupForm {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(3px);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .popup-content {
+      background: linear-gradient(135deg, #fff6ea, #fff);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 95%;
+      max-width: 480px;
+      position: relative;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .popup-content h3 {
+      text-align: center;
+      color: var(--choco);
+      margin-bottom: 10px;
+    }
+
+    .popup-content input, .popup-content textarea {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #e8dcd5;
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .close-popup {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #a56a4e;
+    }
+
+    #statusMessage {
+      text-align: center;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🛒 Cart Sidebar -->
+  <aside id="cartSidebar">
+    <header>
+      <span>Your Cart</span>
+      <button id="closeCart" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">✖</button>
+    </header>
+    <div id="cartItems"></div>
+    <div id="cartTotal">
+      <span>Total:</span> <span id="cartTotalPrice">₹0</span>
+    </div>
+    <button id="checkoutBtn">Proceed to Checkout</button>
+  </aside>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-leaf"></i></div>
+        <div>
+          <div class="brand-title">The Balanced Bite</div>
+          <div class="brand-sub">~ Healthy & Hearty</div>
+        </div>
+      </div>
+
+      <nav>
+        <a class="link" href="index.html">Home</a>
+        <a class="link" href="products.html">Products</a>
+        <a class="link" href="subscriptions.html">Combo Plans</a>
+        <a class="link" href="workshops.html">Workshops</a>
+        <a class="link" href="blog.html">Blog</a>
+        <a class="link" href="bulkorders.html">Bulk Orders</a>
+
+        <!-- 🛒 Cart Icon -->
+        <button id="cartIcon" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--choco)">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Workshops Section -->
+  <section class="section" id="workshops">
+    <div class="container">
+      <div class="section-head">
+        <h2>Baking Workshops</h2>
+        <p class="section-sub">Join our hands-on bakery sessions and bake like a pro ✨</p>
+      </div>
+
+      <div class="workshops">
+        <!-- Workshop 1 -->
+        <div class="work">
+          <div class="top"><b>₹999</b><span class="muted">8 spots left</span></div>
+          <div class="img-wrap">
+            <img src="https://st5.depositphotos.com/9012638/75339/i/450/depositphotos_753392098-stock-photo-traditional-christmas-chocolate-chips-cookies.jpg" alt="Cookies & Breads" class="float-img cookies"/>
+          </div>
+          <h3>Cookies & Breads Masterclass</h3>
+          <p class="muted">November 10, 2025 • 2:00 PM - 5:00 PM • 12/20 enrolled</p>
+          <p>Master the art of baking soft breads and perfect cookies using all-natural ingredients.</p>
+          <button class="btn primary bookBtn" data-workshop="Cookies & Breads Masterclass">Book Now</button>
+        </div>
+
+        <!-- Workshop 2 -->
+        <div class="work">
+          <div class="top"><b>₹1200</b><span class="muted">5 spots left</span></div>
+          <div class="img-wrap">
+            <img src="https://www.shutterstock.com/image-photo/woman-uses-piping-bag-filled-600nw-2199835103.jpg" alt="Cakes & Frosting" class="float-img cakes"/>
+          </div>
+          <h3>Cakes & Frosting Workshop</h3>
+          <p class="muted">December 2, 2025 • 11:00 AM - 3:00 PM • 10/15 enrolled</p>
+          <p>Learn to bake fluffy cakes and create smooth, aesthetic frostings that taste as good as they look.</p>
+          <button class="btn primary bookBtn" data-workshop="Cakes & Frosting Workshop">Book Now</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✨ Popup Form -->
+  <div id="popupForm">
+    <div class="popup-content">
+      <button class="close-popup">&times;</button>
+      <h3>Book Your Workshop</h3>
+      <form id="workshopForm">
+        <input type="text" name="user_name" placeholder="Full Name" required />
+        <input type="email" name="user_email" placeholder="Email Address" required />
+        <input type="text" name="workshop_title" id="workshop_title" readonly />
+        <textarea name="address" placeholder="Enter your address for delivery" required></textarea>
+        <button type="submit" class="btn primary" style="width:100%">Confirm Booking</button>
+      </form>
+      <div id="statusMessage"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="background: linear-gradient(45deg, #8B4513, #D2691E); color: white; text-align: center; padding: 20px;">
+    <p>&copy; 2025 <strong>The Balanced Bite</strong> 🍪 | All Rights Reserved.</p>
+  </footer>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("dobj_sa5cMFqd4DDQ");
+    })();
+
+    const popup = document.getElementById("popupForm");
+    const closeBtn = document.querySelector(".close-popup");
+    const bookBtns = document.querySelectorAll(".bookBtn");
+    const form = document.getElementById("workshopForm");
+    const statusMsg = document.getElementById("statusMessage");
+    const workshopTitle = document.getElementById("workshop_title");
+
+    bookBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        workshopTitle.value = btn.dataset.workshop;
+        popup.style.display = "flex";
+      });
+    });
+
+    closeBtn.addEventListener("click", () => {
+      popup.style.display = "none";
+      statusMsg.textContent = "";
+    });
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      emailjs.sendForm("service_jttyrxh", "template_4v2w1zl", this)
+        .then(() => {
+          statusMsg.innerHTML = "<span style='color:green;'>✅ Booking confirmed! Check your Gmail for details.</span>";
+          form.reset();
+        }, (error) => {
+          statusMsg.innerHTML = "<span style='color:red;'>❌ Something went wrong. Please try again.</span>";
+          console.error("EmailJS Error:", error);
+        });
+    });
+
+    window.addEventListener("click", e => {
+      if (e.target === popup) {
+        popup.style.display = "none";
+        statusMsg.textContent = "";
+      }
+    });
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>

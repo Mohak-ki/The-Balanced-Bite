@@ -1,0 +1,330 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Balanced Bite — Healthy & Hearty</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* 🌿 Navbar Styling */
+    header {
+      background: linear-gradient(90deg, #8B4513, #D2691E);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 30px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand .logo i {
+      font-size: 1.8rem;
+      color: #fff;
+    }
+
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+
+    .brand-sub {
+      font-size: 0.8rem;
+      color: #ffe;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    nav a.link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    nav a.link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #fff;
+      transition: width 0.3s ease;
+    }
+
+    nav a.link:hover::after {
+      width: 100%;
+    }
+
+    nav button,
+    nav a#userIcon {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    nav a#userIcon i,
+    nav button i {
+      font-size: 1.2rem;
+    }
+
+    /* 🛒 Cart */
+    nav button#cartIcon {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    nav button#cartIcon:hover {
+      transform: scale(1.1);
+    }
+
+    /* 👩‍💼 User Avatar */
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #fff;
+      color: #8B4513;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      border: 2px solid #A0522D;
+    }
+
+    /* 🚪 Logout Button */
+    .logout-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 7px 16px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background: #c0392b;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 🛒 Cart Sidebar -->
+  <aside id="cartSidebar">
+    <header>
+      <span>Your Cart</span>
+      <button id="closeCart">✖</button>
+    </header>
+    <div id="cartItems"></div>
+    <div id="cartTotal">
+      <span>Total:</span> <span id="cartTotalPrice">₹0</span>
+    </div>
+    <button id="checkoutBtn">Proceed to Checkout</button>
+  </aside>
+
+  <!-- Promo Bar -->
+  <div class="promo">
+    <strong>15% off on all orders above ₹2000</strong>. Use code <strong>GUTFRIENDLY</strong> • Free delivery on orders above ₹1000
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-leaf"></i></div>
+        <div>
+          <div class="brand-title">The Balanced Bite</div>
+          <div class="brand-sub">~ Healthy & Hearty</div>
+        </div>
+      </div>
+
+      <nav>
+        <a class="link" href="index.html">Home</a>
+     
+        <a class="link" href="products.html">Products</a>
+        <a class="link" href="subscriptions.html">Combo Plans</a>
+        <a class="link" href="workshops.html">Workshops</a> <a href="/mern" style="color:#2e7d32; font-weight:bold;">🥗 Diet Planner (MERN)</a>
+        <a class="link" href="blog.html">Blog</a>
+        <a class="link" href="bulkorders.html">Bulk Orders</a>
+
+        <!-- 👤 Default User Icon -->
+        <a href="./signin.html" id="userIcon" title="Sign In / Admin Access">
+          <i class="fa-solid fa-user-shield"></i>
+        </a>
+
+        <!-- 🛒 Cart Icon -->
+        <button id="cartIcon">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </button>
+
+        <!-- 👩‍💼 Avatar + Logout (hidden initially) -->
+        <div id="userArea" style="display:none; align-items:center; gap:10px;">
+          <div id="userAvatar" class="user-avatar">U</div>
+          <button id="logoutBtn" class="logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="container hero-wrap">
+      <div>
+        <span class="hero-badge"><i class="fa-solid fa-seedling"></i> 100% Natural • Clean Ingredients</span>
+        <h1>Gut-Friendly <span class="sub">Baked Goods</span></h1>
+        <p>Delicious, clean-ingredient treats that support your gut health and overall wellness. Perfect for PCOS-friendly and hormone-balancing diets.</p>
+
+        <div class="cta">
+          <a href="products.html" class="btn primary"><i class="fa-solid fa-bag-shopping"></i> Shop Now</a>
+        </div>
+
+        <div class="points">
+          <div class="pill"><span class="ic">GF</span><div><b>Gluten Free</b><br><small>Certified Safe</small></div></div>
+          <div class="pill"><span class="ic">V</span><div><b>Vegan Options</b><br><small>Plant Based</small></div></div>
+          <div class="pill"><span class="ic">NS</span><div><b>No Refined Sugar</b><br><small>Natural Sweeteners</small></div></div>
+          <div class="pill"><span class="ic"><i class="fa-solid fa-heart"></i></span><div><b>Gut-Friendly</b><br><small>Digestive Health</small></div></div>
+        </div>
+      </div>
+
+      <div class="hero-media">
+        <div class="hero-card">
+          <img src="https://plus.unsplash.com/premium_photo-1670895802184-176bbb53a2f7?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0" alt="Assorted clean-ingredient bakes" />
+        </div>
+        <div class="sticker"><i class="fa-solid fa-heart"></i> PCOS Friendly</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background: linear-gradient(45deg, #8B4513, #D2691E); color: white; text-align: center; padding: 20px;">
+    <p>&copy; 2025 <strong>The Balanced Bite</strong> 🍪 | All Rights Reserved.</p>
+  </footer>
+
+ 
+
+  <script src="script.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <script>
+    // 🧁 Checkout Auth Check
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener("click", async () => {
+        const token = localStorage.getItem("userToken");
+
+        if (!token) {
+          document.getElementById("loginPopup").style.display = "block";
+          document.getElementById("loginPopupOverlay").style.display = "block";
+          document.querySelector("#loginPopup h3").innerText = "Sign Up Required";
+          document.querySelector("#loginPopup p").innerHTML =
+            "You need to <b>sign up or sign in</b> before confirming your order.<br>Join us to continue to checkout 🍰";
+
+          document.getElementById("goToSigninBtn").innerText = "Sign Up Now";
+          return;
+        }
+
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        if (cart.length === 0) return alert("🛒 Your cart is empty!");
+
+        try {
+          const res = await fetch("http://localhost:5000/api/payment/create-checkout-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ items: cart }),
+          });
+          const data = await res.json();
+          if (data.url) window.location.href = data.url;
+          else alert("Error creating Stripe checkout session");
+        } catch (err) {
+          console.error(err);
+          alert("Payment failed. Check console for details.");
+        }
+      });
+    }
+
+    document.getElementById("goToSigninBtn").addEventListener("click", () => {
+      window.location.href = "signin.html?signup=true";
+    });
+    document.getElementById("closePopupBtn").addEventListener("click", () => {
+      document.getElementById("loginPopup").style.display = "none";
+      document.getElementById("loginPopupOverlay").style.display = "none";
+    });
+
+    // 🚪 Avatar + Logout Logic
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userIcon = document.getElementById("userIcon");
+    const userArea = document.getElementById("userArea");
+    const userAvatar = document.getElementById("userAvatar");
+
+    const token = localStorage.getItem("userToken");
+    if (token) {
+      const userName = localStorage.getItem("userName") || "U";
+      const initial = userName.charAt(0).toUpperCase();
+
+      document.querySelector("#userArea").style.display = "flex";
+      userAvatar.textContent = initial;
+      userIcon.style.display = "none";
+    }
+
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("userToken");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("cart");
+      localStorage.removeItem("justLoggedIn");
+      alert("You have been logged out 🍪");
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - The Balanced Bite</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #8B4513, #D2691E);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .admin-box {
+      background: #fff;
+      color: #333;
+      border-radius: 15px;
+      padding: 40px;
+      width: 350px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #8B4513;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      width: 100%;
+      background: linear-gradient(90deg, #8B4513, #D2691E);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #D2691E, #8B4513);
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-box">
+    <h2>Admin Login</h2>
+    <input type="email" id="adminEmail" placeholder="Admin Email" required>
+    <input type="password" id="adminPassword" placeholder="Password" required>
+    <button id="adminLoginBtn">Login</button>
+    <p id="loginMsg" style="color:red; font-size:0.9rem; margin-top:10px;"></p>
+  </div>
+
+  <script>
+    document.getElementById("adminLoginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("adminEmail").value;
+      const password = document.getElementById("adminPassword").value;
+
+      const res = await fetch("http://localhost:5000/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem("adminToken", data.token);
+        window.location.href = "admin-dashboard.html";
+      } else {
+        document.getElementById("loginMsg").innerText = data.message || "Login failed";
+      }
+    });
+  </script>
+</body>
+</html>

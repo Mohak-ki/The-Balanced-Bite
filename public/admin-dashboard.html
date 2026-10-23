@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Balanced Bite | Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --choco: #4e342e;
+      --choco-light: #8B4513;
+      --mint: #6fbfa8;
+      --rose: #f6c7d7;
+      --cream: #faf6f3;
+      --danger: #ef4444;
+      --gray: #f3f4f6;
+      --text: #333;
+    }
+
+    * {margin:0; padding:0; box-sizing:border-box;}
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: linear-gradient(180deg, var(--choco), var(--choco-light));
+      color: white;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+    .brand img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: white;
+      object-fit: cover;
+      padding: 4px;
+    }
+    .brand h1 {
+      font-size: 1.4rem;
+      line-height: 1.2;
+    }
+    .brand p {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .nav-links {
+      list-style: none;
+      margin-top: 20px;
+    }
+    .nav-links li {
+      padding: 12px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-links li:hover,
+    .nav-links li.active {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px 30px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile img {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--mint);
+    }
+    .logout-btn {
+      background: var(--danger);
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .section-title {
+      color: var(--choco);
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap: 20px;
+      margin-bottom: 35px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: 0.3s;
+    }
+    .stat-card:hover {transform: translateY(-4px);}
+    .stat-icon {
+      font-size: 1.6rem;
+      color: var(--mint);
+      background: rgba(111,191,168,0.1);
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .stat-info h4 {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .stat-info p {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--choco);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--gray);
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--choco);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .scrollable-table {
+      max-height: 300px;
+      overflow-y: auto;
+      border-radius: 10px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 25px;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 20px;
+    }
+    .chart-card h3 {
+      font-size: 1rem;
+      color: var(--choco);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    select {
+      padding: 5px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 0.9rem;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Tab Styles */
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--mint);
+      border-bottom-color: var(--mint);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tab-container {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    /* Status badges */
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-badge.active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-badge.new {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .order-count {
+      background: #6fbfa8;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .retry-btn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: #6fbfa8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 900px) {
+      .charts-grid {grid-template-columns: 1fr;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="brand">
+      <img src="https://cdn-icons-png.flaticon.com/512/3021/3021129.png" alt="Logo">
+      <div>
+        <h1>The Balanced Bite</h1>
+        <p>Admin Dashboard</p>
+      </div>
+    </div>
+    <ul class="nav-links">
+      <li class="active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</li>
+      <li data-section="products"><i class="fas fa-cookie-bite"></i> Products</li>
+      <li data-section="customers"><i class="fas fa-users"></i> Customers</li>
+    </ul>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h2 class="section-title" id="pageTitle">Dashboard Overview</h2>
+      <div class="profile">
+        <img src="https://i.pinimg.com/736x/b1/65/16/b165166e15af905331a77f352cf7d99e.jpg" alt="Admin">
+        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <div class="section active" id="dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-wallet"></i></div><div class="stat-info"><h4>Total Revenue</h4><p>₹12,450</p></div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-box"></i></div><div class="stat-info"><h4>Total Orders</h4><p>24</p></div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-cookie-bite"></i></div><div class="stat-info"><h4>Total Products</h4><p>20</p></div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-friends"></i></div><div class="stat-info"><h4>Total Customers</h4><p id="totalCustomersCount">156</p></div></div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Revenue Overview
+            <select id="monthSelect">
+              <option>January</option><option>February</option><option>March</option>
+              <option>April</option><option selected>May</option><option>June</option>
+            </select>
+          </h3>
+          <canvas id="revenueChart" height="100"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h3>Product Categories
+            <select id="categorySelect">
+              <option selected>All</option><option>Cookies</option><option>Brownies</option><option>Cakes</option><option>Combos</option>
+            </select>
+          </h3>
+          <canvas id="categoryChart" height="100"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS SECTION -->
+    <div class="section" id="products">
+      <h3 class="section-title">Product List</h3>
+      <div class="scrollable-table">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Category</th><th>Price (₹)</th><th>Stock</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Gut-Friendly Oat Cookies</td><td>Cookies</td><td>350</td><td>45</td><td>Active</td></tr>
+            <tr><td>2</td><td>Vegan Brownies</td><td>Brownies</td><td>450</td><td>30</td><td>Active</td></tr>
+            <tr><td>3</td><td>Clean Ingredient Almond Cake</td><td>Cakes</td><td>650</td><td>25</td><td>Active</td></tr>
+            <tr><td>4</td><td>Probiotic Banana Muffins</td><td>Cookies</td><td>380</td><td>60</td><td>Active</td></tr>
+            <tr><td>5</td><td>DIY Cookie Mix Kit</td><td>Cookies</td><td>420</td><td>40</td><td>Active</td></tr>
+            <tr><td>6</td><td>Healthy Snack Pack</td><td>Cookies</td><td>650</td><td>20</td><td>Out of Stock</td></tr>
+            <tr><td>7</td><td>Almond Butter Cookies</td><td>Cookies</td><td>360</td><td>50</td><td>Active</td></tr>
+            <tr><td>8</td><td>Dark Chocolate Brownies</td><td>Brownies</td><td>470</td><td>35</td><td>Active</td></tr>
+            <tr><td>9</td><td>Vegan Carrot Cake</td><td>Cakes</td><td>680</td><td>25</td><td>Active</td></tr>
+            <tr><td>10</td><td>Classic Choco Chip Cookies</td><td>Cookies</td><td>330</td><td>70</td><td>Active</td></tr>
+            <tr><td>11</td><td>Peanut Butter Brownie</td><td>Brownies</td><td>470</td><td>28</td><td>Out of Stock</td></tr>
+            <tr><td>12</td><td>Banana Bread Cake</td><td>Cakes</td><td>600</td><td>40</td><td>Active</td></tr>
+            <tr><td>13</td><td>Oatmeal Raisin Cookies</td><td>Cookies</td><td>310</td><td>60</td><td>Active</td></tr>
+            <tr><td>14</td><td>Walnut Brownie</td><td>Brownies</td><td>430</td><td>30</td><td>Active</td></tr>
+            <tr><td>15</td><td>Blueberry Cheesecake</td><td>Cakes</td><td>750</td><td>15</td><td>Out of Stock</td></tr>
+            <tr><td>16</td><td>Protein Snack Mix</td><td>Cookies</td><td>500</td><td>32</td><td>Active</td></tr>
+            <tr><td>17</td><td>Hazelnut Cookies</td><td>Cookies</td><td>340</td><td>38</td><td>Active</td></tr>
+            <tr><td>18</td><td>Multigrain Cookies</td><td>Cookies</td><td>310</td><td>42</td><td>Active</td></tr>
+            <tr><td>19</td><td>Salted Caramel Brownie</td><td>Brownies</td><td>540</td><td>22</td><td>Active</td></tr>
+            <tr><td>20</td><td>Strawberry Vanilla Cake</td><td>Cakes</td><td>680</td><td>18</td><td>Active</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="section-title" style="margin-top:30px;">Combo Plans</h3>
+      <table>
+        <thead>
+          <tr><th>Plan Name</th><th>Price (₹)</th><th>Contents</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Gut Health Starter</td><td>650</td><td>2 Cookie Packs, 1 Brownie Pack, Guide</td><td>Active</td></tr>
+          <tr><td>PCOS Wellness Box</td><td>950</td><td>3 Cookie Packs, 2 Brownie Packs, 1 Cake Slice</td><td>Active</td></tr>
+          <tr><td>Complete Wellness Package</td><td>1200</td><td>4 Cookie Packs, 3 Brownie Packs, 1 Cake, DIY Mix</td><td>Active</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CUSTOMERS SECTION -->
+    <div class="section" id="customers">
+      <h3 class="section-title">Customer Management</h3>
+
+      <!-- Customer Stats -->
+      <div class="stats-grid" style="margin-bottom: 20px;">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-users"></i></div>
+          <div class="stat-info">
+            <h4>Total Customers</h4>
+            <p id="totalCustomers">0</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+          <div class="stat-info">
+            <h4>Active Customers</h4>
+            <p id="activeCustomers">0</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-indian-rupee-sign"></i></div>
+          <div class="stat-info">
+            <h4>Avg. Order Value</h4>
+            <p id="avgOrderValue">₹0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs for Customers vs Orders -->
+      <div class="tab-container">
+        <button class="tab-btn active" data-tab="customers-list">Registered Customers</button>
+        <button class="tab-btn" data-tab="customer-orders">Customer Orders</button>
+      </div>
+
+      <!-- Registered Customers Tab -->
+      <div class="tab-content active" id="customers-list">
+        <div class="scrollable-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Join Date</th>
+                <th>Total Orders</th>
+                <th>Total Spent</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="customersTableBody">
+              <tr><td colspan="7">Loading customers...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Customer Orders Tab -->
+      <div class="tab-content" id="customer-orders">
+        <div class="scrollable-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Email</th>
+                <th>Items Ordered</th>
+                <th>Total (₹)</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr><td colspan="6">Loading orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Customer Management Functions
+    async function loadAllCustomers() {
+      const tableBody = document.getElementById('customersTableBody');
+      tableBody.innerHTML = '<tr><td colspan="7"><div style="text-align:center;padding:20px;color:#666;"><i class="fas fa-spinner fa-spin"></i> Loading customers...</div></td></tr>';
+
+      try {
+        console.log("🔄 Fetching customers from API...");
+        
+        const res = await fetch('http://localhost:5000/api/admin/all-customers');
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        console.log("API Response:", data);
+
+        if (!data.success) {
+          throw new Error(data.message || "API returned unsuccessful");
+        }
+
+        if (!data.data || data.data.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7">
+                <div style="text-align:center;padding:30px;color:#666;">
+                  <i class="fas fa-users" style="font-size:2rem;margin-bottom:10px;display:block;"></i>
+                  No customers registered yet.
+                  ${data.note ? `<br><small>${data.note}</small>` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+          updateCustomerStats([]);
+          return;
+        }
+
+        // Update customer stats
+        updateCustomerStats(data.data);
+
+        // Populate customers table
+        tableBody.innerHTML = data.data.map(customer => {
+          // Format the date safely
+          let joinDate = 'Recent';
+          try {
+            joinDate = new Date(customer.join_date).toLocaleDateString('en-IN');
+          } catch (e) {
+            joinDate = 'Recent';
+          }
+          
+          return `
+            <tr>
+              <td>#${customer.id}</td>
+              <td><strong>${customer.name}</strong></td>
+              <td>${customer.email}</td>
+              <td>${joinDate}</td>
+              <td><span class="order-count">${customer.total_orders}</span></td>
+              <td><strong>₹${customer.total_spent.toFixed(2)}</strong></td>
+              <td><span class="status-badge ${customer.total_orders > 0 ? 'active' : 'new'}">${customer.total_orders > 0 ? 'Active' : 'New'}</span></td>
+            </tr>
+          `;
+        }).join('');
+
+        console.log(`✅ Successfully loaded ${data.data.length} customers`);
+
+      } catch (err) {
+        console.error('❌ Error loading customers:', err);
+        
+        // Show detailed error in the table
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7">
+              <div style="text-align:center;padding:20px;color:#dc2626;">
+                <i class="fas fa-exclamation-triangle" style="font-size:1.5rem;margin-bottom:10px;display:block;"></i>
+                Error loading customer data
+                <br>
+                <small style="color:#666;">${err.message}</small>
+                <br>
+                <button class="retry-btn" onclick="loadAllCustomers()">
+                  <i class="fas fa-redo"></i> Try Again
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+        
+        updateCustomerStats([]);
+      }
+    }
+
+    async function loadCustomerOrders() {
+      const tableBody = document.getElementById('ordersTableBody');
+      tableBody.innerHTML = '<tr><td colspan="6"><div style="text-align:center;padding:20px;color:#666;"><i class="fas fa-spinner fa-spin"></i> Loading orders...</div></td></tr>';
+
+      try {
+        const res = await fetch('http://localhost:5000/api/admin/customers');
+        const data = await res.json();
+
+        if (!data.success) throw new Error("Failed to fetch orders");
+
+        if (!data.data || data.data.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="6">
+                <div style="text-align:center;padding:30px;color:#666;">
+                  <i class="fas fa-shopping-bag" style="font-size:2rem;margin-bottom:10px;display:block;"></i>
+                  No customer orders found yet.
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = data.data.map(order => {
+          const itemsText = order.items && order.items.length > 0 
+            ? order.items.map(i => `${i.name} (${i.quantity})`).join(', ')
+            : 'Various items';
+            
+          return `
+            <tr>
+              <td>#${order.order_id}</td>
+              <td>${order.name}</td>
+              <td>${order.email}</td>
+              <td>${itemsText}</td>
+              <td>₹${order.total.toFixed(2)}</td>
+              <td>${new Date(order.created_at).toLocaleDateString('en-IN')}</td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Error loading orders:', err);
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6">
+              <div style="text-align:center;padding:20px;color:#dc2626;">
+                <i class="fas fa-exclamation-triangle"></i> Error loading orders
+                <br>
+                <button class="retry-btn" onclick="loadCustomerOrders()">
+                  <i class="fas fa-redo"></i> Try Again
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    function updateCustomerStats(customers) {
+      const totalCustomers = customers.length;
+      const activeCustomers = customers.filter(c => c.total_orders > 0).length;
+      const totalRevenue = customers.reduce((sum, c) => sum + c.total_spent, 0);
+      const avgOrderValue = activeCustomers > 0 ? totalRevenue / activeCustomers : 0;
+
+      document.getElementById('totalCustomers').textContent = totalCustomers;
+      document.getElementById('activeCustomers').textContent = activeCustomers;
+      document.getElementById('avgOrderValue').textContent = `₹${avgOrderValue.toFixed(2)}`;
+      
+      // Also update the dashboard stat
+      document.getElementById('totalCustomersCount').textContent = totalCustomers;
+    }
+
+    // Tab functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load initial data
+      loadAllCustomers();
+      loadCustomerOrders();
+
+      // Tab switching
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const tabId = this.dataset.tab;
+          
+          // Update active tab buttons
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Update active tab content
+          document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+
+      // Auto-refresh every 30 seconds
+      setInterval(() => {
+        const activeTab = document.querySelector('.tab-content.active').id;
+        if (activeTab === 'customers-list') {
+          loadAllCustomers();
+        } else {
+          loadCustomerOrders();
+        }
+      }, 30000);
+    });
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("adminToken");
+      window.location.href = "index.html";
+    });
+
+    // Sidebar navigation
+    document.querySelectorAll(".nav-links li").forEach(li => {
+      li.addEventListener("click", () => {
+        document.querySelectorAll(".nav-links li").forEach(item => item.classList.remove("active"));
+        li.classList.add("active");
+        const section = li.dataset.section;
+        document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+        document.getElementById(section).classList.add("active");
+        document.getElementById("pageTitle").textContent = li.textContent.trim();
+        
+        // Load customer data when switching to customers section
+        if (section === 'customers') {
+          loadAllCustomers();
+          loadCustomerOrders();
+        }
+      });
+    });
+
+    // Charts
+    const revenueData = {
+      January: [1200, 2200, 3000, 4200, 4800, 5100],
+      February: [2500, 3100, 3600, 3900, 4100, 4600],
+      March: [3000, 4200, 5100, 6400, 7200, 8000],
+      April: [4000, 5200, 6100, 7400, 8200, 9400],
+      May: [5000, 6500, 7200, 8800, 9400, 12450],
+      June: [6000, 7300, 8200, 9100, 9900, 15000]
+    };
+
+    const ctx1 = document.getElementById("revenueChart");
+    const revenueChart = new Chart(ctx1, {
+      type: "line",
+      data: {
+        labels: ["Week 1","Week 2","Week 3","Week 4","Week 5","Week 6"],
+        datasets: [{
+          label: "Revenue (₹)",
+          data: revenueData["May"],
+          borderColor: "#6fbfa8",
+          backgroundColor: "rgba(111,191,168,0.2)",
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    document.getElementById("monthSelect").addEventListener("change", e => {
+      const month = e.target.value;
+      revenueChart.data.datasets[0].data = revenueData[month];
+      revenueChart.update();
+    });
+
+    const categoryData = {
+      All: { labels: ["Cookies","Brownies","Cakes","Combos"], data: [40,25,20,15], colors: ["#f6c7d7","#6fbfa8","#8B4513","#c9a57a"] },
+      Cookies: { labels: ["Oat","Chocolate Chip","Multigrain","Protein"], data: [35,30,20,15], colors: ["#8B4513","#dca77d","#c9a57a","#6fbfa8"] },
+      Brownies: { labels: ["Classic","Walnut","Vegan","Protein"], data: [40,25,20,15], colors: ["#6b3a2d","#8B4513","#a66444","#f6c7d7"] },
+      Cakes: { labels: ["Chocolate","Red Velvet","Vanilla","Cheesecake"], data: [30,35,25,10], colors: ["#d16b5b","#f6c7d7","#ffe0c1","#6fbfa8"] },
+      Combos: { labels: ["Cookie+Brownie","Brownie+Cake","Cookie+Cake","Assorted"], data: [25,20,35,20], colors: ["#6fbfa8","#f6c7d7","#c9a57a","#8B4513"] }
+    };
+
+    const ctx2 = document.getElementById("categoryChart");
+    const categoryChart = new Chart(ctx2, {
+      type: "doughnut",
+      data: { labels: categoryData["All"].labels, datasets: [{ data: categoryData["All"].data, backgroundColor: categoryData["All"].colors }] },
+      options: { plugins: { legend: { position: "bottom" } } }
+    });
+
+    document.getElementById("categorySelect").addEventListener("change", e => {
+      const cat = categoryData[e.target.value];
+      categoryChart.data.labels = cat.labels;
+      categoryChart.data.datasets[0].data = cat.data;
+      categoryChart.data.datasets[0].backgroundColor = cat.colors;
+      categoryChart.update();
+    });
+  </script>
+</body>
+</html>

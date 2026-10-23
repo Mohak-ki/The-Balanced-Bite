@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Balanced Bite | React MERN Nutrition Planner</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body style="background:#fdfaf6; font-family:'Segoe UI', sans-serif; margin:0; padding:0;">
+  <div id="react-root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function MernNutritionApp() {
+      const [meals, setMeals] = useState([]);
+      const [form, setForm] = useState({ itemName: "", category: "High-Protein", calories: "", protein: "", price: "" });
+      const [editingId, setEditingId] = useState(null);
+      const [status, setStatus] = useState("");
+
+      const fetchMeals = async () => {
+        try {
+          const res = await fetch("/api/mern/meals");
+          const data = await res.json();
+          if (Array.isArray(data)) setMeals(data);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      useEffect(() => { fetchMeals(); }, []);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        const method = editingId ? "PUT" : "POST";
+        const url = editingId ? `/api/mern/meals/${editingId}` : "/api/mern/meals";
+
+        const res = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            itemName: form.itemName,
+            category: form.category,
+            calories: Number(form.calories),
+            protein: Number(form.protein || 0),
+            price: Number(form.price)
+          })
+        });
+
+        if (res.ok) {
+          setForm({ itemName: "", category: "High-Protein", calories: "", protein: "", price: "" });
+          setEditingId(null);
+          setStatus(editingId ? "Updated in MongoDB!" : "Saved to MongoDB!");
+          fetchMeals();
+          setTimeout(() => setStatus(""), 3000);
+        }
+      };
+
+      const handleEdit = (meal) => {
+        setEditingId(meal._id);
+        setForm({
+          itemName: meal.itemName,
+          category: meal.category,
+          calories: meal.calories,
+          protein: meal.protein,
+          price: meal.price
+        });
+      };
+
+      const handleDelete = async (id) => {
+        await fetch(`/api/mern/meals/${id}`, { method: "DELETE" });
+        fetchMeals();
+      };
+
+      return (
+        <div style={{ maxWidth: "900px", margin: "40px auto", padding: "24px", background: "#fff", borderRadius: "12px", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "2px solid #f0e6d2", paddingBottom: "16px", marginBottom: "24px" }}>
+            <div>
+              <h1 style={{ margin: 0, color: "#5c3d2e" }}>🥗 The Balanced Bite — Custom Diet & Macro Planner</h1>
+              <p style={{ margin: "4px 0 0", color: "#777" }}>Powered by MongoDB, Express.js, React.js & Node.js (MERN Stack)</p>
+            </div>
+            <a href="index.html" style={{ textDecoration: "none", background: "#5c3d2e", color: "#fff", padding: "10px 16px", borderRadius: "6px" }}>← Back to Home</a>
+          </div>
+
+          {status && <div style={{ padding: "10px", background: "#e8f5e9", color: "#2e7d32", borderRadius: "6px", marginBottom: "16px", fontWeight: "bold" }}>✅ {status}</div>}
+
+          <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", background: "#faf6f0", padding: "20px", borderRadius: "8px", marginBottom: "28px" }}>
+            <input required placeholder="Bake / Meal Name" value={form.itemName} onChange={e => setForm({...form, itemName: e.target.value})} style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+            <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}>
+              <option value="High-Protein">High-Protein</option>
+              <option value="Gluten-Free">Gluten-Free</option>
+              <option value="Keto">Keto</option>
+              <option value="Vegan">Vegan</option>
+            </select>
+            <input required type="number" placeholder="Calories (kcal)" value={form.calories} onChange={e => setForm({...form, calories: e.target.value})} style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+            <input type="number" placeholder="Protein (g)" value={form.protein} onChange={e => setForm({...form, protein: e.target.value})} style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+            <input required type="number" placeholder="Price (₹)" value={form.price} onChange={e => setForm({...form, price: e.target.value})} style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+            <button type="submit" style={{ background: "#2e7d32", color: "white", border: "none", padding: "12px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>
+              {editingId ? "Update Item" : "+ Add to MongoDB"}
+            </button>
+          </form>
+
+          <h3>📋 Active MongoDB Custom Diet Items ({meals.length})</h3>
+          {meals.length === 0 ? (
+            <p style={{ color: "#888" }}>No items in MongoDB yet. Add your first healthy bake above!</p>
+          ) : (
+            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+              <thead>
+                <tr style={{ borderBottom: "2px solid #eee", color: "#5c3d2e" }}>
+                  <th style={{ padding: "12px" }}>Item Name</th>
+                  <th style={{ padding: "12px" }}>Category</th>
+                  <th style={{ padding: "12px" }}>Macros</th>
+                  <th style={{ padding: "12px" }}>Price</th>
+                  <th style={{ padding: "12px" }}>Actions (CRUD)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {meals.map(meal => (
+                  <tr key={meal._id} style={{ borderBottom: "1px solid #eee" }}>
+                    <td style={{ padding: "12px", fontWeight: "bold" }}>{meal.itemName}</td>
+                    <td style={{ padding: "12px" }}><span style={{ background: "#eee", padding: "4px 8px", borderRadius: "4px", fontSize: "13px" }}>{meal.category}</span></td>
+                    <td style={{ padding: "12px" }}>{meal.calories} kcal | {meal.protein}g Protein</td>
+                    <td style={{ padding: "12px" }}>₹{meal.price}</td>
+                    <td style={{ padding: "12px" }}>
+                      <button onClick={() => handleEdit(meal)} style={{ marginRight: "8px", padding: "6px 12px", background: "#f57c00", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>Edit</button>
+                      <button onClick={() => handleDelete(meal._id)} style={{ padding: "6px 12px", background: "#d32f2f", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("react-root"));
+    root.render(<MernNutritionApp />);
+  </script>
+</body>
+</html>

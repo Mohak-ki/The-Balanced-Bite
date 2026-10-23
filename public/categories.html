@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Balanced Bite - Categories</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+  <!-- Your stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- 🛒 Cart Sidebar -->
+  <aside id="cartSidebar">
+    <header>
+      <span>Your Cart</span>
+      <button id="closeCart" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">✖</button>
+    </header>
+    <div id="cartItems"></div>
+    <div id="cartTotal">
+      <span>Total:</span> <span id="cartTotalPrice">₹0</span>
+    </div>
+    <button id="checkoutBtn">Proceed to Checkout</button>
+  </aside>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-leaf"></i></div>
+        <div>
+          <div class="brand-title">The Balanced Bite</div>
+          <div class="brand-sub">~ Healthy & Hearty</div>
+        </div>
+      </div>
+
+      <nav>
+       <a class="link" href="index.html">Home</a>
+        <a class="link" href="products.html">Products</a>
+        <a class="link" href="subscriptions.html">Combo Plans</a>
+        <a class="link" href="workshops.html">Workshops</a>
+        <a class="link" href="blog.html">Blog</a>
+        <a class="link" href="bulkorders.html">Bulk Orders</a>
+
+        <!-- 🛒 Cart Icon -->
+        <button id="cartIcon" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--choco)">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 💖 Categories Section -->
+  <section id="categories" class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>Our Healthy Categories</h2>
+          <p class="section-sub">Find the perfect treats tailored to your dietary needs and health goals 🌿</p>
+        </div>
+      </div>
+
+      <!-- Category Cards -->
+      <div class="categories-grid">
+        <!-- Sugar Free Category -->
+        <div class="category-card">
+          <div class="category-image">
+            <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Sugar Free Desserts">
+          </div>
+          <div class="category-content">
+            <h3>Sugar Free Delights</h3>
+            <p>Sweet treats made with natural sweeteners, perfect for diabetics and health-conscious individuals</p>
+            <button class="btn explore-btn" data-category="sugar-free">Explore Products</button>
+          </div>
+          <div class="category-products" id="sugar-free-products" style="display: none;">
+            <!-- Products will be dynamically added here -->
+          </div>
+        </div>
+
+        <!-- Low Calorie Snacks -->
+        <div class="category-card">
+          <div class="category-image">
+            <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Low Calorie Snacks">
+          </div>
+          <div class="category-content">
+            <h3>Low Calorie Snacks</h3>
+            <p>Guilt-free snacks under 150 calories per serving, perfect for weight management</p>
+            <button class="btn explore-btn" data-category="low-calorie">Explore Products</button>
+          </div>
+          <div class="category-products" id="low-calorie-products" style="display: none;">
+            <!-- Products will be dynamically added here -->
+          </div>
+        </div>
+
+        <!-- PCOS Friendly -->
+        <div class="category-card">
+          <div class="category-image">
+            <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="PCOS Friendly Desserts">
+          </div>
+          <div class="category-content">
+            <h3>PCOS Friendly Desserts</h3>
+            <p>Hormone-balancing treats with ingredients that support PCOS management</p>
+            <button class="btn explore-btn" data-category="pcos-friendly">Explore Products</button>
+          </div>
+          <div class="category-products" id="pcos-friendly-products" style="display: none;">
+            <!-- Products will be dynamically added here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background: linear-gradient(45deg, #8B4513, #D2691E); color: white; text-align: center; padding: 20px;">
+    <p>&copy; 2025 <strong>The Balanced Bite</strong> 🍪 | All Rights Reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+<script>
+    // Category products data using your existing products + new ones
+    const categoryProducts = {
+      'sugar-free': [
+        {
+          name: "Sugar Free Almond Cookies",
+          price: 320,
+          image: "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Crunchy almond cookies sweetened with stevia, zero added sugar"
+        },
+        {
+          name: "Zero Sugar Brownies",
+          price: 420,
+          image: "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Rich chocolate brownies with monk fruit sweetener"
+        },
+        {
+          name: "Diabetic Friendly Cake",
+          price: 580,
+          image: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Moist cake sweetened with erythritol, perfect for diabetics"
+        },
+        {
+          name: "Stevia Sweetened Muffins",
+          price: 350,
+          image: "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Fluffy muffins with natural stevia, no sugar added"
+        },
+        {
+          name: "Sugar Free Oat Bars",
+          price: 290,
+          image: "https://images.unsplash.com/photo-1623334044303-241021148842?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Chewy oat bars with dates as natural sweetener"
+        },
+        {
+          name: "No Sugar Added Cheesecake",
+          price: 680,
+          image: "https://images.unsplash.com/photo-1524351199678-941a58a3df50?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Creamy cheesecake sweetened with erythritol"
+        }
+      ],
+      'low-calorie': [
+        {
+          name: "100-Calorie Protein Cookies",
+          price: 280,
+          image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "High protein cookies, only 100 calories each"
+        },
+        {
+          name: "Airy Rice Cakes",
+          price: 180,
+          image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Light and crispy rice cakes, 35 calories each"
+        },
+        {
+          name: "Mini Oat Bites",
+          price: 220,
+          image: "https://prashantcorner.com/cdn/shop/files/MultigrainCookies.jpg?v=1730985048",
+          description: "Bite-sized oat snacks, 50 calories each"
+        },
+        {
+          name: "Gut-Friendly Oat Cookies",
+          price: 350,
+          image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Prebiotic-rich oats, only 120 calories per cookie"
+        },
+        {
+          name: "Vegan Carrot Cake",
+          price: 680,
+          image: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Low-calorie carrot cake with natural sweeteners"
+        },
+        {
+          name: "Protein Energy Balls",
+          price: 260,
+          image: "https://thebigmansworld.com/wp-content/uploads/2024/08/protein-cookie-dough-recipe.jpg",
+          description: "Protein-packed energy balls, 80 calories each"
+        }
+      ],
+      'pcos-friendly': [
+        {
+          name: "Cinnamon Bliss Cookies",
+          price: 350,
+          image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Cinnamon cookies to improve insulin sensitivity"
+        },
+        {
+          name: "Flaxseed Brownies",
+          price: 450,
+          image: "https://richanddelish.com/wp-content/uploads/2023/07/Peanut-butter-brownies-1.jpg",
+          description: "Brownies with flaxseeds for hormone balance"
+        },
+        {
+          name: "Inositol Infused Muffins",
+          price: 380,
+          image: "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Muffins with natural inositol sources"
+        },
+        {
+          name: "Vegan Brownies",
+          price: 450,
+          image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Hormone-balancing brownies with cinnamon"
+        },
+        {
+          name: "Probiotic Banana Muffins",
+          price: 380,
+          image: "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Gut-health supporting muffins for PCOS"
+        },
+        {
+          name: "PCOS Wellness Cookies",
+          price: 320,
+          image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Specially formulated cookies for PCOS management"
+        },
+        {
+          name: "Hormone Balance Cake",
+          price: 620,
+          image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Almond cake with PCOS-friendly ingredients"
+        },
+        {
+          name: "Spearmint Tea Cookies",
+          price: 300,
+          image: "https://images.unsplash.com/photo-1623334044303-241021148842?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+          description: "Cookies infused with spearmint for hormone support"
+        }
+      ]
+    };
+
+    // Explore button functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const exploreButtons = document.querySelectorAll('.explore-btn');
+      
+      exploreButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const category = this.getAttribute('data-category');
+          const productsContainer = document.getElementById(`${category}-products`);
+          const categoryData = categoryProducts[category];
+          
+          // Toggle products display
+          if (productsContainer.style.display === 'none') {
+            // Clear previous products
+            productsContainer.innerHTML = '';
+            
+            // Add products to container
+            categoryData.forEach(product => {
+              const productHTML = `
+                <div class="product-card">
+                  <img src="${product.image}" alt="${product.name}">
+                  <div class="product-info">
+                    <h4>${product.name}</h4>
+                    <p>${product.description}</p>
+                    <div class="product-price">₹${product.price}</div>
+                    <button class="btn cart add-to-cart" 
+                            data-name="${product.name}" 
+                            data-price="${product.price}">
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              `;
+              productsContainer.innerHTML += productHTML;
+            });
+            
+            // Show products
+            productsContainer.style.display = 'grid';
+            this.textContent = 'Hide Products';
+          } else {
+            // Hide products
+            productsContainer.style.display = 'none';
+            this.textContent = 'Explore Products';
+          }
+          
+          // Add event listeners to new cart buttons
+          setTimeout(() => {
+            document.querySelectorAll('.add-to-cart').forEach(cartBtn => {
+              cartBtn.addEventListener('click', function() {
+                const name = this.getAttribute('data-name');
+                const price = parseInt(this.getAttribute('data-price'));
+                
+                // Add to cart using existing cart system
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const existing = cart.find(item => item.name === name);
+                
+                if (existing) {
+                  existing.qty += 1;
+                } else {
+                  cart.push({ name: name, price: price, qty: 1 });
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCart();
+                
+                alert(`🛍 ${name} added to your cart!`);
+              });
+            });
+          }, 100);
+        });
+      });
+    });
+  </script>
+  <style>
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .category-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .category-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .category-image img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .category-content {
+      padding: 1.5rem;
+    }
+
+    .category-content h3 {
+      color: var(--choco);
+      margin-bottom: 0.5rem;
+    }
+
+    .category-content p {
+      color: #666;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .category-products {
+      padding: 1.5rem;
+      border-top: 1px solid #eee;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .product-card {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 10px;
+    }
+
+    .product-card img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-info {
+      flex: 1;
+    }
+
+    .product-info h4 {
+      margin: 0 0 0.5rem 0;
+      color: var(--choco);
+    }
+
+    .product-info p {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .product-price {
+      font-weight: bold;
+      color: var(--choco);
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .categories-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .product-card {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</body>
+</html>

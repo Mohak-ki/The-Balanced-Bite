@@ -1,0 +1,16 @@
+# Dependency directories
+node_modules/
+
+# Environment variables (CRITICAL)
+.env
+
+# Editor settings
+.vscode/
+
+# Build outputs (if applicable)
+dist/
+build/
+
+# OS metadata
+.DS_Store
+Thumbs.db
