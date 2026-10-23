@@ -275,7 +275,7 @@
         if (cart.length === 0) return alert("🛒 Your cart is empty!");
 
         try {
-          const res = await fetch("http://localhost:5000/api/payment/create-checkout-session", {
+          const res = await fetch("/api/payment/create-checkout-session", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -230,7 +230,7 @@ if (checkoutBtn) {
 
     // ✅ Logged in → continue with Stripe
     try {
-      const response = await fetch("http://localhost:5000/api/payment/create-checkout-session",  {
+      const response = await fetch("/api/payment/create-checkout-session",  {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

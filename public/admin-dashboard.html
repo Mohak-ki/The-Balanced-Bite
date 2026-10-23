@@ -480,6 +480,37 @@
   </div>
 
   <script>
+    // Escape user/server-supplied strings before putting them in innerHTML,
+    // so a crafted name or email cannot inject script into the dashboard.
+    function esc(value) {
+      return String(value == null ? "" : value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    // The admin API now requires a valid admin token. Attach it, and bounce to
+    // the login page if it is missing or rejected.
+    function adminToken() {
+      return localStorage.getItem("adminToken");
+    }
+    async function adminFetch(url) {
+      const token = adminToken();
+      if (!token) {
+        window.location.href = "admin-login.html";
+        throw new Error("Not authenticated");
+      }
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem("adminToken");
+        window.location.href = "admin-login.html";
+        throw new Error("Session expired");
+      }
+      return res;
+    }
+
     // Customer Management Functions
     async function loadAllCustomers() {
       const tableBody = document.getElementById('customersTableBody');
@@ -488,7 +519,7 @@
       try {
         console.log("🔄 Fetching customers from API...");
         
-        const res = await fetch('http://localhost:5000/api/admin/all-customers');
+        const res = await adminFetch('/api/admin/all-customers');
         
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
@@ -532,12 +563,12 @@
           
           return `
             <tr>
-              <td>#${customer.id}</td>
-              <td><strong>${customer.name}</strong></td>
-              <td>${customer.email}</td>
-              <td>${joinDate}</td>
-              <td><span class="order-count">${customer.total_orders}</span></td>
-              <td><strong>₹${customer.total_spent.toFixed(2)}</strong></td>
+              <td>#${esc(customer.id)}</td>
+              <td><strong>${esc(customer.name)}</strong></td>
+              <td>${esc(customer.email)}</td>
+              <td>${esc(joinDate)}</td>
+              <td><span class="order-count">${Number(customer.total_orders) || 0}</span></td>
+              <td><strong>₹${(Number(customer.total_spent) || 0).toFixed(2)}</strong></td>
               <td><span class="status-badge ${customer.total_orders > 0 ? 'active' : 'new'}">${customer.total_orders > 0 ? 'Active' : 'New'}</span></td>
             </tr>
           `;
@@ -575,7 +606,7 @@
       tableBody.innerHTML = '<tr><td colspan="6"><div style="text-align:center;padding:20px;color:#666;"><i class="fas fa-spinner fa-spin"></i> Loading orders...</div></td></tr>';
 
       try {
-        const res = await fetch('http://localhost:5000/api/admin/customers');
+        const res = await adminFetch('/api/admin/customers');
         const data = await res.json();
 
         if (!data.success) throw new Error("Failed to fetch orders");
@@ -595,17 +626,17 @@
         }
 
         tableBody.innerHTML = data.data.map(order => {
-          const itemsText = order.items && order.items.length > 0 
-            ? order.items.map(i => `${i.name} (${i.quantity})`).join(', ')
+          const itemsText = Array.isArray(order.items) && order.items.length > 0
+            ? order.items.map(i => esc(`${i.name} (${i.quantity ?? i.qty ?? 1})`)).join(', ')
             : 'Various items';
-            
+
           return `
             <tr>
-              <td>#${order.order_id}</td>
-              <td>${order.name}</td>
-              <td>${order.email}</td>
+              <td>#${esc(order.order_id)}</td>
+              <td>${esc(order.name)}</td>
+              <td>${esc(order.email)}</td>
               <td>${itemsText}</td>
-              <td>₹${order.total.toFixed(2)}</td>
+              <td>₹${(Number(order.total) || 0).toFixed(2)}</td>
               <td>${new Date(order.created_at).toLocaleDateString('en-IN')}</td>
             </tr>
           `;

@@ -1,6 +1,7 @@
 ﻿import express from "express";
 import mongoose from "mongoose";
 import MealPlan from "../models/MealPlan.js";
+import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -14,7 +15,19 @@ let fallbackMeals = [
 
 const isMongoConnected = () => mongoose.connection.readyState === 1;
 
-// READ all meals
+// Only copy known fields off the request body, so a client cannot set arbitrary
+// document fields via mass assignment.
+function pickMealFields(body = {}) {
+  const meal = {};
+  if (body.itemName !== undefined) meal.itemName = String(body.itemName);
+  if (body.category !== undefined) meal.category = String(body.category);
+  if (body.calories !== undefined) meal.calories = Number(body.calories);
+  if (body.protein !== undefined) meal.protein = Number(body.protein);
+  if (body.price !== undefined) meal.price = Number(body.price);
+  return meal;
+}
+
+// READ all meals (public)
 router.get("/meals", async (req, res) => {
   try {
     if (isMongoConnected()) {
@@ -27,19 +40,21 @@ router.get("/meals", async (req, res) => {
     }
     res.status(200).json(fallbackMeals);
   } catch (err) {
+    console.error("Error reading meals:", err);
     res.status(200).json(fallbackMeals);
   }
 });
 
-// CREATE a meal
-router.post("/meals", async (req, res) => {
+// CREATE a meal (auth required)
+router.post("/meals", verifyToken, async (req, res) => {
   try {
+    const data = pickMealFields(req.body);
     if (isMongoConnected()) {
-      const meal = new MealPlan(req.body);
+      const meal = new MealPlan(data);
       const saved = await meal.save();
       return res.status(201).json(saved);
     }
-    const newMeal = { _id: Date.now().toString(), ...req.body };
+    const newMeal = { _id: Date.now().toString(), ...data };
     fallbackMeals.unshift(newMeal);
     res.status(201).json(newMeal);
   } catch (err) {
@@ -47,28 +62,29 @@ router.post("/meals", async (req, res) => {
   }
 });
 
-// UPDATE a meal
-router.put("/meals/:id", async (req, res) => {
+// UPDATE a meal (auth required)
+router.put("/meals/:id", verifyToken, async (req, res) => {
   try {
+    const data = pickMealFields(req.body);
     if (isMongoConnected()) {
-      const updated = await MealPlan.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      const updated = await MealPlan.findByIdAndUpdate(req.params.id, data, { new: true });
       return res.status(200).json(updated);
     }
-    fallbackMeals = fallbackMeals.map(m => m._id === req.params.id ? { ...m, ...req.body } : m);
-    res.status(200).json({ _id: req.params.id, ...req.body });
+    fallbackMeals = fallbackMeals.map((m) => (m._id === req.params.id ? { ...m, ...data } : m));
+    res.status(200).json({ _id: req.params.id, ...data });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
 
-// DELETE a meal
-router.delete("/meals/:id", async (req, res) => {
+// DELETE a meal (auth required)
+router.delete("/meals/:id", verifyToken, async (req, res) => {
   try {
     if (isMongoConnected()) {
       await MealPlan.findByIdAndDelete(req.params.id);
       return res.status(200).json({ message: "Deleted from MongoDB" });
     }
-    fallbackMeals = fallbackMeals.filter(m => m._id !== req.params.id);
+    fallbackMeals = fallbackMeals.filter((m) => m._id !== req.params.id);
     res.status(200).json({ message: "Deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });

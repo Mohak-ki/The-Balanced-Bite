@@ -1,17 +1,19 @@
 // backend/routes/payment.js
 import express from "express";
 import Stripe from "stripe";
-import dotenv from "dotenv";
-
-dotenv.config();
+import config from "../config.js";
+import { verifyToken } from "../middleware/auth.js";
+import { findProduct } from "../data/catalog.js";
 
 const router = express.Router();
 
-// ✅ Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+if (!config.stripeSecretKey) {
+  console.warn("⚠️  STRIPE_SECRET_KEY is not set — checkout will not work until it is.");
+}
+const stripe = new Stripe(config.stripeSecretKey || "sk_test_placeholder");
 
-// ✅ Create Checkout Session
-router.post("/create-checkout-session", async (req, res) => {
+// ✅ Create Checkout Session (must be logged in)
+router.post("/create-checkout-session", verifyToken, async (req, res) => {
   try {
     const { items } = req.body;
 
@@ -19,28 +21,43 @@ router.post("/create-checkout-session", async (req, res) => {
       return res.status(400).json({ error: "Cart is empty" });
     }
 
-    const lineItems = items.map(item => ({
-      price_data: {
-        currency: "inr",
-        product_data: { name: item.name },
-        unit_amount: item.price * 100, // convert ₹ to paise
-      },
-      quantity: item.qty,
-    }));
+    // Build line items from SERVER-SIDE prices. The price a client sends is
+    // ignored entirely — we look each product up by name in the catalogue and
+    // charge the real amount, so a tampered cart cannot change the total.
+    const lineItems = [];
+    for (const item of items) {
+      const product = findProduct(item?.name);
+      if (!product) {
+        return res.status(400).json({ error: `Unknown product: ${item?.name ?? "item"}` });
+      }
 
-    // ✅ Redirects now go to your Live Server (frontend)
+      const qty = Number(item?.qty);
+      if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
+        return res.status(400).json({ error: `Invalid quantity for ${product.name}` });
+      }
+
+      lineItems.push({
+        price_data: {
+          currency: "inr",
+          product_data: { name: product.name },
+          unit_amount: Math.round(product.price * 100), // rupees → paise
+        },
+        quantity: qty,
+      });
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/success.html`,
-      cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
+      success_url: `${config.clientUrl}/success.html`,
+      cancel_url: `${config.clientUrl}/cancel.html`,
     });
 
     res.json({ url: session.url });
   } catch (err) {
     console.error("Stripe error:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Unable to start checkout" });
   }
 });
 

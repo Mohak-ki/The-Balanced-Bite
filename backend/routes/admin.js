@@ -1,33 +1,41 @@
 // backend/routes/admin.js
 import express from "express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import db from "../db.js";
+import config from "../config.js";
+import { requireAdmin } from "../middleware/auth.js";
+import { rateLimit } from "../middleware/rateLimit.js";
 
 const router = express.Router();
 
 // ==============================
-// 🧠 Admin Login
+// 🧠 Admin Login (public, but rate limited)
 // ==============================
-router.post("/login", async (req, res) => {
+const loginLimiter = rateLimit({ max: 10, message: "Too many login attempts. Try again later." });
+
+router.post("/login", loginLimiter, async (req, res) => {
   const { email, password } = req.body;
+
+  // One generic response for every failure case (unknown email, wrong
+  // password, missing fields) so the endpoint cannot be used to discover which
+  // admin emails exist.
+  const invalid = () =>
+    res.status(401).json({ success: false, message: "Invalid email or password" });
+
+  if (!email || !password) return invalid();
 
   try {
     const [rows] = await db.query("SELECT * FROM admins WHERE email = ?", [email]);
-    if (rows.length === 0)
-      return res.status(401).json({ success: false, message: "Admin not found" });
+    if (rows.length === 0) return invalid();
 
     const admin = rows[0];
     const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) return invalid();
 
-    if (!isMatch)
-      return res.status(401).json({ success: false, message: "Invalid password" });
-
-    const token = jwt.sign(
-      { id: admin.id, role: "admin" },
-      process.env.JWT_SECRET || "supersecret",
-      { expiresIn: "2h" }
-    );
+    const token = jwt.sign({ id: admin.id, role: "admin" }, config.jwtSecret, {
+      expiresIn: config.jwtExpiresIn,
+    });
 
     res.json({ success: true, token });
   } catch (err) {
@@ -37,89 +45,81 @@ router.post("/login", async (req, res) => {
 });
 
 // ==============================
-// 🔍 Check Users Table Structure
+// Everything below requires a valid admin token.
 // ==============================
-router.get("/check-users-table", async (req, res) => {
-  try {
-    const [columns] = await db.query("DESCRIBE users");
-    const [sampleData] = await db.query("SELECT * FROM users LIMIT 5");
-    res.json({ success: true, columns, sampleData });
-  } catch (err) {
-    console.error("Error checking users table:", err);
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
+router.use(requireAdmin);
 
 // ==============================
-// 👥 Fetch All Registered Customers (with hardcoded order + spend data)
+// 👥 Fetch All Registered Customers
 // ==============================
 router.get("/all-customers", async (req, res) => {
   try {
-    console.log("📋 Fetching all customers (with dummy totals)...");
+    // Real per-customer order counts and spend, joined from the orders table,
+    // instead of fabricated demo figures.
+    const [rows] = await db.query(
+      `SELECT u.id, u.name, u.email,
+              COUNT(o.id)            AS total_orders,
+              COALESCE(SUM(o.total), 0) AS total_spent
+         FROM users u
+         LEFT JOIN orders o ON o.user_id = u.id
+        GROUP BY u.id, u.name, u.email
+        ORDER BY u.id`
+    );
 
-    const [rows] = await db.query("SELECT id, name, email FROM users");
-
-    // Add fake total_orders & total_spent values for demo
-    const customers = rows.map((c, i) => ({
+    const customers = rows.map((c) => ({
       id: c.id,
       name: c.name || "Unknown",
       email: c.email || "—",
-      join_date: new Date().toISOString().split("T")[0],
-      total_orders: (i + 1) * 2, // e.g., 2, 4, 6, ...
-      total_spent: (i + 1) * 850, // e.g., ₹850, ₹1700, ₹2550, ...
-      status: "Active",
+      total_orders: Number(c.total_orders) || 0,
+      total_spent: Number(c.total_spent) || 0,
+      status: Number(c.total_orders) > 0 ? "Active" : "New",
     }));
 
-    console.log(`✅ ${customers.length} customers fetched successfully`);
     res.json({ success: true, data: customers });
   } catch (err) {
     console.error("❌ ERROR in /all-customers route:", err);
-    res.status(500).json({
-      success: false,
-      message: "Database query failed",
-      error: err.sqlMessage || err.message,
-    });
+    res.status(500).json({ success: false, message: "Failed to load customers" });
   }
 });
 
 // ==============================
-// 📦 Fetch All Customer Orders (Mock Data)
+// 📦 Fetch All Customer Orders
 // ==============================
 router.get("/customers", async (req, res) => {
   try {
-    console.log("📦 Fetching all customer orders (mock data)");
+    const [rows] = await db.query(
+      `SELECT o.id   AS order_id,
+              u.name AS name,
+              u.email AS email,
+              o.total,
+              o.items,
+              o.created_at
+         FROM orders o
+         JOIN users u ON o.user_id = u.id
+        ORDER BY o.created_at DESC`
+    );
 
-    const mockOrders = [
-      {
-        order_id: 1001,
-        name: "Priya Sharma",
-        email: "priya.sharma@email.com",
-        total: 1250,
-        items: [{ name: "Oat Cookies", quantity: 2 }],
-        created_at: new Date('2025-01-12'),
-      },
-      {
-        order_id: 1002,
-        name: "Rahul Verma",
-        email: "rahul.verma@email.com",
-        total: 680,
-        items: [{ name: "Brownies", quantity: 1 }],
-        created_at: new Date('2025-02-10'),
-      },
-      {
-        order_id: 1003,
-        name: "Rashi Patel",
-        email: "rashi.patel@email.com",
-        total: 1450,
-        items: [{ name: "Choco Cookies", quantity: 3 }],
-        created_at: new Date('2025-03-05'),
-      },
-    ];
+    const orders = rows.map((o) => {
+      let items = [];
+      try {
+        items = typeof o.items === "string" ? JSON.parse(o.items) : o.items || [];
+      } catch {
+        items = [];
+      }
+      return {
+        order_id: o.order_id,
+        name: o.name,
+        email: o.email,
+        total: Number(o.total) || 0,
+        items,
+        created_at: o.created_at,
+      };
+    });
 
-    res.json({ success: true, data: mockOrders });
+    res.json({ success: true, data: orders });
   } catch (err) {
-    console.error("❌ Error fetching mock orders:", err);
-    res.status(500).json({ success: false, message: err.message });
+    console.error("❌ Error fetching orders:", err);
+    res.status(500).json({ success: false, message: "Failed to load orders" });
   }
 });
 
