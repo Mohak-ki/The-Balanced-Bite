@@ -1,16 +1,13 @@
 // backend/routes/orders.js
 import express from "express";
-import db from "../db.js";
 import { verifyToken, requireAdmin } from "../middleware/auth.js";
+import { createOrder, listOrdersWithUser } from "../store.js";
 
 const router = express.Router();
 
-// ==============================
-// 🧁 POST: Create a new order (must be logged in)
-// ==============================
-// The owning user is taken from the verified token, not the request body, so a
-// caller cannot place an order on someone else's account. Uses the promise API
-// (the pool is created with mysql2/promise), which the old callback form broke.
+// 🧁 POST: Create a new order (must be logged in). The owner comes from the
+// verified token, not the request body, so orders can't be placed on someone
+// else's account.
 router.post("/", verifyToken, async (req, res) => {
   try {
     const { total, items } = req.body;
@@ -20,12 +17,7 @@ router.post("/", verifyToken, async (req, res) => {
     if (!Array.isArray(items) || items.length === 0)
       return res.status(400).json({ error: "Order has no items" });
 
-    await db.query("INSERT INTO orders (user_id, total, items) VALUES (?, ?, ?)", [
-      req.user.id,
-      total,
-      JSON.stringify(items),
-    ]);
-
+    await createOrder({ user_id: req.user.id, total, items });
     res.json({ success: true, message: "Order placed successfully!" });
   } catch (err) {
     console.error("❌ Error creating order:", err);
@@ -33,22 +25,18 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// ==============================
 // 📦 GET: All orders (admin only)
-// ==============================
 router.get("/", requireAdmin, async (req, res) => {
   try {
-    const [results] = await db.query(
-      `SELECT o.id   AS order_id,
-              u.name  AS customer_name,
-              u.email AS customer_email,
-              o.total AS amount_paid,
-              o.items,
-              o.created_at
-         FROM orders o
-         JOIN users u ON o.user_id = u.id
-        ORDER BY o.created_at DESC`
-    );
+    const rows = await listOrdersWithUser();
+    const results = rows.map((o) => ({
+      order_id: o.order_id,
+      customer_name: o.name,
+      customer_email: o.email,
+      amount_paid: o.total,
+      items: o.items,
+      created_at: o.created_at,
+    }));
     res.json(results);
   } catch (err) {
     console.error("❌ Error fetching orders:", err);

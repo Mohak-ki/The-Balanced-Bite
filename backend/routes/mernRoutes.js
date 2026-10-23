@@ -1,7 +1,7 @@
 ﻿import express from "express";
 import mongoose from "mongoose";
 import MealPlan from "../models/MealPlan.js";
-import { verifyToken } from "../middleware/auth.js";
+
 
 const router = express.Router();
 
@@ -45,8 +45,8 @@ router.get("/meals", async (req, res) => {
   }
 });
 
-// CREATE a meal (auth required)
-router.post("/meals", verifyToken, async (req, res) => {
+// CREATE a meal (open CRUD for the demo planner)
+router.post("/meals", async (req, res) => {
   try {
     const data = pickMealFields(req.body);
     if (isMongoConnected()) {
@@ -62,8 +62,8 @@ router.post("/meals", verifyToken, async (req, res) => {
   }
 });
 
-// UPDATE a meal (auth required)
-router.put("/meals/:id", verifyToken, async (req, res) => {
+// UPDATE a meal
+router.put("/meals/:id", async (req, res) => {
   try {
     const data = pickMealFields(req.body);
     if (isMongoConnected()) {
@@ -77,8 +77,8 @@ router.put("/meals/:id", verifyToken, async (req, res) => {
   }
 });
 
-// DELETE a meal (auth required)
-router.delete("/meals/:id", verifyToken, async (req, res) => {
+// DELETE a meal
+router.delete("/meals/:id", async (req, res) => {
   try {
     if (isMongoConnected()) {
       await MealPlan.findByIdAndDelete(req.params.id);

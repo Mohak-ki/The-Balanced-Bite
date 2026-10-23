@@ -2,13 +2,13 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import db from "../db.js";
 import config from "../config.js";
 import { rateLimit } from "../middleware/rateLimit.js";
+import { findUserByEmail, createUser } from "../store.js";
 
 const router = express.Router();
 
-const authLimiter = rateLimit({ max: 15, message: "Too many attempts. Try again later." });
+const authLimiter = rateLimit({ max: 50, message: "Too many attempts. Try again later." });
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -31,20 +31,17 @@ router.post("/signup", authLimiter, async (req, res) => {
       return res.json({ success: false, message: "Name is too long" });
     if (!EMAIL_RE.test(email))
       return res.json({ success: false, message: "Please enter a valid email address" });
-    if (String(password).length < 8)
-      return res.json({ success: false, message: "Password must be at least 8 characters" });
+    if (String(password).length < 6)
+      return res.json({ success: false, message: "Password must be at least 6 characters" });
 
-    const [existing] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
-    if (existing.length > 0)
+    const existing = await findUserByEmail(email);
+    if (existing)
       return res.json({ success: false, message: "User already registered" });
 
     const hashedPass = await bcrypt.hash(password, 10);
-    const [result] = await db.query(
-      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPass]
-    );
+    const { id } = await createUser({ name, email, password: hashedPass });
 
-    const token = signToken({ id: result.insertId, email });
+    const token = signToken({ id, email });
 
     res.json({
       success: true,
@@ -68,11 +65,10 @@ router.post("/signin", authLimiter, async (req, res) => {
     if (!email || !password)
       return res.json({ success: false, message: "Invalid email or password" });
 
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
-    if (rows.length === 0)
+    const user = await findUserByEmail(email);
+    if (!user)
       return res.json({ success: false, message: "Invalid email or password" });
 
-    const user = rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.json({ success: false, message: "Invalid email or password" });

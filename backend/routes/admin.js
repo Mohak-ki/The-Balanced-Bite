@@ -2,34 +2,32 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import db from "../db.js";
 import config from "../config.js";
 import { requireAdmin } from "../middleware/auth.js";
 import { rateLimit } from "../middleware/rateLimit.js";
+import { findAdminByEmail, customerAggregates, listOrdersWithUser } from "../store.js";
 
 const router = express.Router();
 
 // ==============================
 // 🧠 Admin Login (public, but rate limited)
 // ==============================
-const loginLimiter = rateLimit({ max: 10, message: "Too many login attempts. Try again later." });
+const loginLimiter = rateLimit({ max: 50, message: "Too many login attempts. Try again later." });
 
 router.post("/login", loginLimiter, async (req, res) => {
   const { email, password } = req.body;
 
-  // One generic response for every failure case (unknown email, wrong
-  // password, missing fields) so the endpoint cannot be used to discover which
-  // admin emails exist.
+  // One generic response for every failure case so the endpoint cannot be used
+  // to discover which admin emails exist.
   const invalid = () =>
     res.status(401).json({ success: false, message: "Invalid email or password" });
 
   if (!email || !password) return invalid();
 
   try {
-    const [rows] = await db.query("SELECT * FROM admins WHERE email = ?", [email]);
-    if (rows.length === 0) return invalid();
+    const admin = await findAdminByEmail(String(email).trim().toLowerCase());
+    if (!admin) return invalid();
 
-    const admin = rows[0];
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) return invalid();
 
@@ -49,23 +47,10 @@ router.post("/login", loginLimiter, async (req, res) => {
 // ==============================
 router.use(requireAdmin);
 
-// ==============================
-// 👥 Fetch All Registered Customers
-// ==============================
+// 👥 All registered customers with real order counts and spend
 router.get("/all-customers", async (req, res) => {
   try {
-    // Real per-customer order counts and spend, joined from the orders table,
-    // instead of fabricated demo figures.
-    const [rows] = await db.query(
-      `SELECT u.id, u.name, u.email,
-              COUNT(o.id)            AS total_orders,
-              COALESCE(SUM(o.total), 0) AS total_spent
-         FROM users u
-         LEFT JOIN orders o ON o.user_id = u.id
-        GROUP BY u.id, u.name, u.email
-        ORDER BY u.id`
-    );
-
+    const rows = await customerAggregates();
     const customers = rows.map((c) => ({
       id: c.id,
       name: c.name || "Unknown",
@@ -74,7 +59,6 @@ router.get("/all-customers", async (req, res) => {
       total_spent: Number(c.total_spent) || 0,
       status: Number(c.total_orders) > 0 ? "Active" : "New",
     }));
-
     res.json({ success: true, data: customers });
   } catch (err) {
     console.error("❌ ERROR in /all-customers route:", err);
@@ -82,23 +66,10 @@ router.get("/all-customers", async (req, res) => {
   }
 });
 
-// ==============================
-// 📦 Fetch All Customer Orders
-// ==============================
+// 📦 All customer orders
 router.get("/customers", async (req, res) => {
   try {
-    const [rows] = await db.query(
-      `SELECT o.id   AS order_id,
-              u.name AS name,
-              u.email AS email,
-              o.total,
-              o.items,
-              o.created_at
-         FROM orders o
-         JOIN users u ON o.user_id = u.id
-        ORDER BY o.created_at DESC`
-    );
-
+    const rows = await listOrdersWithUser();
     const orders = rows.map((o) => {
       let items = [];
       try {
@@ -115,7 +86,6 @@ router.get("/customers", async (req, res) => {
         created_at: o.created_at,
       };
     });
-
     res.json({ success: true, data: orders });
   } catch (err) {
     console.error("❌ Error fetching orders:", err);
